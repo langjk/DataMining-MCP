@@ -133,7 +133,59 @@
   "description": "用户要求对比第2批次和第5批次的稳定性"
 }
 
-7. noop（不调用任何工具，仅用于普通回复）
+7. multi_batch_analysis（多批次分析工具）
+- 说明：对多个批次（3个以上）进行综合分析，包括稳定性趋势分析、异常批次检测等。
+- tool: "multi_batch_analysis"
+- args:
+  - batch_paths: list（多个批次的CSV文件路径列表）
+  - batch_names: list（各批次名称列表，可选）
+  - analysis_type: string（分析类型："stability_trend"稳定性趋势（包括均值、标准差变化趋势）/"outlier_detection"异常检测/"comprehensive"综合分析）
+  - columns: list（要分析的列名，可选）
+  - time_column: string（时间列名，可选）
+- 示例：
+{
+  "action": "invoke_tool",
+  "tool": "multi_batch_analysis",
+  "args": {
+    "batch_paths": [
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-01随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-02随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-03随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-04随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-05随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-06随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-07随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-08随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-09随机振动试验（公开）.csv",
+      "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-10随机振动试验（公开）.csv"
+    ],
+    "batch_names": ["第1批次", "第2批次", "第3批次", "第4批次", "第5批次", "第6批次", "第7批次", "第8批次", "第9批次", "第10批次"],
+    "analysis_type": "stability_trend",
+    "columns": ["Vi", "Ii", "Vo1", "效率"]
+  },
+  "description": "用户要求分析十个批次的稳定性变化趋势"
+}
+
+8. time_series_analysis（时间序列分析工具）
+- 说明：对单个批次进行时间序列分析，生成变化曲线，适用于"看变化曲线"类需求。
+- tool: "time_series_analysis"
+- args:
+  - file_path: string（CSV文件路径）
+  - columns: list（要分析的列名，可选）
+  - time_column: string（时间列名，可选）
+- 示例：
+{
+  "action": "invoke_tool",
+  "tool": "time_series_analysis",
+  "args": {
+    "file_path": "./data/测试数据正（公开）/振动（公开）/XXX-254-31Z01-03随机振动试验（公开）.csv",
+    "columns": ["Vi", "Ii", "Vo1", "效率"],
+    "time_column": "时间"
+  },
+  "description": "用户想看第3批次的变化曲线"
+}
+
+9. noop（不调用任何工具，仅用于普通回复）
 - 说明：当用户只提问一些常识性问题时，仅回复内容。
 - tool: "noop"
 - reply: string（你的回答内容）
@@ -145,6 +197,8 @@
 - "稳定性分析"、"趋势分析"、"数据质量"、"综合分析" → 使用 data_analysis
 - "批次对比"、"批次比较"、"X批次和Y批次" → 使用 batch_comparison
 - "第X批次"单独分析 → 使用 data_analysis
+- "多个批次"、"十个批次"、"所有批次"、"批次趋势"、"异常批次"、"哪个批次异常"、"均值变化趋势"、"稳定性变化趋势" → 使用 multi_batch_analysis
+- "变化曲线"、"时间序列"、"看曲线"、"数据变化趋势" → 使用 time_series_analysis
 
 智能识别批次编号规则：
 - 文件名格式：XXX-254-31Z01-{批次号:02d}...csv
